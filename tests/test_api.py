@@ -34,3 +34,17 @@ def test_predict(client, sentence, expected_label):
     assert data["label"] == expected_label
     assert isinstance(data["score"], float)
     assert 0.0 <= data["score"] <= 1.0
+
+def test_predict_batch(client):
+    sentences = [
+        "The patient denies chest pain.",
+        "He has a history of hypertension."
+    ]
+    response = client.post("/predict_batch", json={"sentences": sentences})
+    assert response.status_code == 200
+    
+    data = response.json()
+    assert "predictions" in data
+    assert len(data["predictions"]) == 2
+    assert data["predictions"][0]["label"] == "ABSENT"
+    assert data["predictions"][1]["label"] == "PRESENT"

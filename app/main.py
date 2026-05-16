@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from contextlib import asynccontextmanager
 import time
 
-from app.schemas import PredictRequest, PredictResponse
+from app.schemas import PredictRequest, PredictResponse, BatchPredictRequest, BatchPredictResponse
 from app.model import bert_classifier
 
 @asynccontextmanager
@@ -41,4 +41,21 @@ def predict(request: PredictRequest):
         )
     except Exception as e:
         print(f"Error during prediction: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+@app.post("/predict_batch", response_model=BatchPredictResponse)
+def predict_batch(request: BatchPredictRequest):
+    try:
+        start_time = time.time()
+        
+        predictions = bert_classifier.predict_batch(request.sentences)
+        
+        end_time = time.time()
+        print(f"Batch prediction for {len(request.sentences)} sentences took {end_time - start_time:.4f}s")
+        
+        return BatchPredictResponse(
+            predictions=[PredictResponse(**pred) for pred in predictions]
+        )
+    except Exception as e:
+        print(f"Error during batch prediction: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")

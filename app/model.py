@@ -22,5 +22,15 @@ class ClinicalBertClassifier:
             "score": float(result["score"])
         }
 
+    def predict_batch(self, texts: list[str]):
+        if not self.classifier:
+            raise RuntimeError("Model is not loaded.")
+        
+        results = self.classifier(texts)
+        return [
+            {"label": res["label"], "score": float(res["score"])}
+            for res in results
+        ]
+
 # Global instance to be loaded once
 bert_classifier = ClinicalBertClassifier()
