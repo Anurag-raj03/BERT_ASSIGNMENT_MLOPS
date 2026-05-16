@@ -2,8 +2,6 @@ import pytest
 from fastapi.testclient import TestClient
 from app.main import app
 
-# Create a test client that will trigger the lifespan event
-# By using 'with TestClient(app) as client', the lifespan setup/teardown is executed.
 @pytest.fixture(scope="module")
 def client():
     with TestClient(app) as c:
@@ -17,10 +15,6 @@ def test_health_check(client):
 @pytest.mark.parametrize("sentence, expected_label", [
     ("The patient denies chest pain.", "ABSENT"),
     ("He has a history of hypertension.", "PRESENT"),
-    # The assignment PDF lists "CONDITIONAL" for this test case.
-    # However, the model `bvanaken/clinical-assertion-negation-bert` 
-    # only supports PRESENT, ABSENT, and POSSIBLE labels. 
-    # Therefore, we assert the actual model output (PRESENT).
     ("If the patient experiences dizziness, reduce the dosage.", "PRESENT"),
     ("No signs of pneumonia were observed.", "ABSENT")
 ])
